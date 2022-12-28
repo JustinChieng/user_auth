@@ -101,7 +101,7 @@
     </div>
     <!-- Go back link -->
     <div class="text-center">
-        <a href="index.php" class="text-decoration-none"><i class="bi bi-arrow-left-circle"></i> Go back</a>
+        <a href="/" class="text-decoration-none"><i class="bi bi-arrow-left-circle"></i> Go back</a>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
