@@ -2,6 +2,11 @@
     
     session_start();
 
+    if ( !isset( $_SESSION['home_csrf_token'] ) ) {
+        // generate csrf token
+        $_SESSION['home_csrf_token'] = bin2hex( random_bytes(32) );
+      }
+
     $database = new PDO(
         'mysql:host=localhost;dbname=user_auth',
         'root',
@@ -15,10 +20,18 @@
         $students_00 = $query->fetchAll();
     
         if(
-            $_SERVER['REQUEST_METHOD'] === 'POST'
-        ){
+            $_SERVER['REQUEST_METHOD'] === 'POST'){
+
+         
+      
             if ($_POST['action']==='add')
             {
+                if ( $_POST['home_csrf_token'] !== $_SESSION['home_csrf_token'] )
+                {
+                  die("Nice try! But I'm smarter than you!");
+                }
+                unset( $_SESSION['home_csrf_token'] );
+                
                 //add 
                 $statement = $database -> prepare(
                     "INSERT INTO students (`name`) 
@@ -30,6 +43,9 @@
         
                 header('Location:/');
                 exit;
+
+               
+          
 
             }
     
@@ -107,6 +123,11 @@
                                 echo " ";
                             }
                         ?>
+                         <input 
+                type="hidden"
+                name="home_csrf_token"
+                value="<?php echo $_SESSION['home_csrf_token']; ?>"
+                />
                     </form>
                 </div>
                 <!-- add -->
@@ -157,6 +178,7 @@
                         }
                         
                         ?>
+                       
                     </form>
                     <!-- =============----Delete ----================== -->
                 </div>

@@ -2,6 +2,15 @@
     
   session_start();
 
+  // !isset() = is not set
+    // if $_SESSION['login_csrf_token'] is not set, generate a new token
+    // when token is already available, we won't regenerate it again
+
+    if ( !isset( $_SESSION['login_csrf_token'] ) ) {
+      // generate csrf token
+      $_SESSION['login_csrf_token'] = bin2hex( random_bytes(32) );
+    }
+
     // connect to db (db = data base);
     $database = new PDO (
         'mysql:host=localhost;dbname=user_auth',
@@ -11,6 +20,15 @@
   
     //make sure it's Form POST request
     if ($_SERVER['REQUEST_METHOD'] === 'POST'){
+
+      // verify the csrf token is correct or not
+      if ( $_POST['login_csrf_token'] !== $_SESSION['login_csrf_token'] )
+      {
+        die("Nice try! But I'm smarter than you!");
+      }
+
+      unset( $_SESSION['login_form_csrf_token'] );
+
       //Trigger sign-up process
       $email = $_POST['email'];
       $password = $_POST['password'];
@@ -96,6 +114,11 @@
                 <div class="d-grid">
                     <button type="submit" class="btn btn-primary btn-fu">Login</button>
                 </div>
+                <input 
+                type="hidden"
+                name="login_csrf_token"
+                value="<?php echo $_SESSION['login_csrf_token']; ?>"
+                />
             </form>
         </div>
     </div>
